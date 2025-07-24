@@ -1,0 +1,13 @@
+.page {
+
+}
+
+@media (prefers-color-scheme: dark) {
+  .page {
+    
+  }
+}
+
+.main {
+  
+}
