@@ -28,7 +28,7 @@ You can sign up for a free account to get an API key.
 Feel free to copy the CSS and repurpose for the test, not looking for everything to be pixel perfect and written from scratch.
 ```
 
-## Considerations
+## Project Plan
 There are a few ways to implement the above. I could implement a static NextJS application which simply fetches the movies from The Movie DB API with pagination. There isn't an explicit request to host this application.
 
 However, as this is a demonstration of skills, for the sake of this exercise I will be creating the following:
