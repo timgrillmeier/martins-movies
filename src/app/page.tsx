@@ -1,19 +1,22 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import { getPopularMovies, searchMovies } from "../utils/api";
+import MoviesList from "../components/MoviesList";
 
-export default async function Home({ searchParams }: { searchParams: Promise<{ query: string; page: string }>; }) {
-  const { query = '', page = '1'} = await searchParams
-  const paginationIndex = parseInt(page) // 1 it not provided
-  const paginationCount = 6 // assuming 6 per page for now
+export default async function Home({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
+  const params = await searchParams;
+  const page = parseInt((params.page as string) || "1", 10);
+  const query = (params.query as string) || "";
+  let initialData = null;
+
+  if (query) {
+    initialData = await searchMovies({ query, page });
+  } else {
+    initialData = await getPopularMovies({ page });
+  }
 
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <h1>Martin's Movies</h1>
-        <p>Params test</p>
-        <p>Query: "{query}"</p>
-        <p>Page: "{paginationIndex}"</p>
-      </main>
+    <div style={{ padding: 24 }}>
+      <h1>Martin's Movies v2</h1>
+      <MoviesList initialData={initialData} initialQuery={query} initialPage={page} />
     </div>
   );
 }
