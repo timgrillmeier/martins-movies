@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { getPopularMovies, searchMovies } from "../utils/api";
 import { useRouter } from "next/navigation";
 
@@ -10,45 +10,76 @@ interface MoviesListProps {
 }
 
 export default function MoviesList({ initialData, initialQuery, initialPage }: MoviesListProps) {
+  const SEARCH_THROTTLE_MS = 400;
+  const ignoreNextPageEffect = useRef(false);
   const [movies, setMovies] = useState(initialData?.results || []);
   const [query, setQuery] = useState(initialQuery);
   const [page, setPage] = useState(initialPage);
   const [loading, setLoading] = useState(false);
   const [lastQuery, setLastQuery] = useState(initialQuery);
+  const searchTimeout = useRef<NodeJS.Timeout | null>(null);
   const router = useRouter();
 
   useEffect(() => {
-    if (page === initialPage && query === initialQuery) return;
-    setLoading(true);
+    if (query === lastQuery) return;
+    ignoreNextPageEffect.current = true;
+    setPage(1);
+    setLastQuery(query);
 
-    if (query !== lastQuery) {
-      setPage(1);
-      setLastQuery(query);
+    // Clear previous timeout if set
+    if (searchTimeout.current) {
+        clearTimeout(searchTimeout.current)
+        console.log('clearing timeout')
     }
 
+    searchTimeout.current = setTimeout(async () => {
+      setLoading(true);
+      let res;
+      if (query) {
+        res = await searchMovies({ query, page: 1 });
+        router.replace(`/query/${encodeURIComponent(query)}`);
+      } else {
+        res = await getPopularMovies({ page: 1 });
+        router.replace("/");
+      }
+      setMovies(res?.results || []);
+      setLoading(false);
+    }, SEARCH_THROTTLE_MS);
+    return () => {
+      if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    };
+  }, [query]);
+
+  useEffect(() => {
+    if (ignoreNextPageEffect.current) { // Ignore the page update this time
+        ignoreNextPageEffect.current = false; // Reset flag
+        return; 
+    }
+    
+    if (page === initialPage && query === initialQuery) return;
+    setLoading(true);
     const fetchData = async () => {
       let res;
       if (query) {
         res = await searchMovies({ query, page });
+        if (page !== 1) {
+          router.replace(`/query/${encodeURIComponent(query)}/page/${page}`);
+        } else {
+          router.replace(`/query/${encodeURIComponent(query)}`);
+        }
       } else {
         res = await getPopularMovies({ page });
+        if (page !== 1) {
+          router.replace(`/page/${page}`);
+        } else {
+          router.replace("/");
+        }
       }
       setMovies(res?.results || []);
       setLoading(false);
     };
     fetchData();
-    // Update URL for SPA navigation using pretty URLs
-    let url = "/";
-    if (query && page !== 1) {
-      url = `/query/${encodeURIComponent(query)}/page/${page}`;
-    } else if (query) {
-      url = `/query/${encodeURIComponent(query)}`;
-    } else if (page !== 1) {
-      url = `/page/${page}`;
-    }
-    router.replace(url);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, query]);
+  }, [page]);
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
@@ -57,7 +88,6 @@ export default function MoviesList({ initialData, initialQuery, initialPage }: M
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setPage(1);
-    // setQuery will trigger useEffect
   };
 
   return (
