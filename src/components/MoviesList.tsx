@@ -14,11 +14,18 @@ export default function MoviesList({ initialData, initialQuery, initialPage }: M
   const [query, setQuery] = useState(initialQuery);
   const [page, setPage] = useState(initialPage);
   const [loading, setLoading] = useState(false);
+  const [lastQuery, setLastQuery] = useState(initialQuery);
   const router = useRouter();
 
   useEffect(() => {
     if (page === initialPage && query === initialQuery) return;
     setLoading(true);
+
+    if (query !== lastQuery) {
+      setPage(1);
+      setLastQuery(query);
+    }
+
     const fetchData = async () => {
       let res;
       if (query) {
