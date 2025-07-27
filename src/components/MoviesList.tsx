@@ -22,18 +22,18 @@ export default function MoviesList({ initialData, initialQuery, initialPage }: M
 
   useEffect(() => {
     if (query === lastQuery) return;
-    ignoreNextPageEffect.current = true;
-    setPage(1);
-    setLastQuery(query);
 
     // Clear previous timeout if set
     if (searchTimeout.current) {
         clearTimeout(searchTimeout.current)
-        console.log('clearing timeout')
     }
 
     searchTimeout.current = setTimeout(async () => {
+      ignoreNextPageEffect.current = true;
+      setPage(1);
+      setLastQuery(query);
       setLoading(true);
+      
       let res;
       if (query) {
         res = await searchMovies({ query, page: 1 });
