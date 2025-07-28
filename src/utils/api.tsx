@@ -53,9 +53,14 @@ export async function searchMovies({
             Authorization: `Bearer ${ACCESS_TOKEN}`
         }
     }
-    
-    // Make API call
-    const res = await fetch(url.toString(), options)
+
+    // Make API call and genres call in parallel
+    const [res, genresRes] = await Promise.all([
+        fetch(url.toString(), options),
+        getMovieGenres()
+    ]);
+
+    let moviesJson = null;
     if (!res.ok) {
         console.error(`Issue fetching search results: ${res.status} ${res.statusText} - ${url.toString()}`);
         try {
@@ -65,8 +70,27 @@ export async function searchMovies({
            console.error(e);
         }
         return null;
+    } else {
+        moviesJson = await res.json();
     }
-    return res.json();
+
+    // Patch genre names
+    const genreMap = (genresRes?.genres || []).reduce((acc: Record<number, string>, g: any) => {
+        acc[g.id] = g.name;
+        return acc;
+    }, {});
+    if (Array.isArray(moviesJson?.results)) {
+        moviesJson.results = moviesJson.results.map((movie: any) => {
+            if (Array.isArray(movie.genre_ids)) {
+                return {
+                    ...movie,
+                    _genre_names: movie.genre_ids.map((id: number) => genreMap[id]).filter(Boolean)
+                };
+            }
+            return movie;
+        });
+    }
+    return moviesJson;
 }
 
 export async function getPopularMovies({
@@ -89,9 +113,14 @@ export async function getPopularMovies({
             Authorization: `Bearer ${ACCESS_TOKEN}`
         }
     }
-    
-    // Make API call
-    const res = await fetch(url.toString(), options)
+
+    // Make API call and genres call in parallel
+    const [res, genresRes] = await Promise.all([
+        fetch(url.toString(), options),
+        getMovieGenres()
+    ]);
+
+    let moviesJson = null;
     if (!res.ok) {
         console.error(`Issue fetching popular movies: ${res.status} ${res.statusText} - ${url.toString()}`);
         try {
@@ -101,6 +130,25 @@ export async function getPopularMovies({
             console.error(e);
         }
         return null;
+    } else {
+        moviesJson = await res.json();
     }
-    return res.json();
+
+    // Patch genre names
+    const genreMap = (genresRes?.genres || []).reduce((acc: Record<number, string>, g: any) => {
+        acc[g.id] = g.name;
+        return acc;
+    }, {});
+    if (Array.isArray(moviesJson?.results)) {
+        moviesJson.results = moviesJson.results.map((movie: any) => {
+            if (Array.isArray(movie.genre_ids)) {
+                return {
+                    ...movie,
+                    _genre_names: movie.genre_ids.map((id: number) => genreMap[id]).filter(Boolean)
+                };
+            }
+            return movie;
+        });
+    }
+    return moviesJson;
 }

@@ -49,15 +49,15 @@ const MovieTile: React.FC<MovieTileProps> = ({
               </a>
             </div>
             <h2 className="title">{title}</h2>
-            <div className="stars">
-                <div className="rating">
+            <div className="stars d-flex flex-row align-items-top col-12">
+                <div className="rating mr-2" style={{minWidth:'60px'}}>
                     <i className="fa fa-star"></i>
-                    <span>{formatRating(rating)}/10</span>
-                    <span className="category">{category}</span>
+                    <span className="mr-2">{formatRating(rating)}/10</span>
                 </div>
+                <div style={{textAlign:'right',width:'100%',flexGrow:1}}> <span className="category flex-grow-1">{category}</span></div>
             </div>
             <p className="movie-tile-description">{description}</p>
-            <a href={detailsUrl} className="btn btn-main btn-effect" style={{ cursor: "pointer" }}>
+            <a href={detailsUrl} target="_blank" className="btn btn-main btn-effect" style={{ cursor: "pointer" }}>
               details
             </a>
           </div>

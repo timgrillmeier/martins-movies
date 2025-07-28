@@ -47,17 +47,17 @@ const MovieAccordion: React.FC<MovieAccordionProps> = ({
               <span className="movie-accordion-title" style={{ fontWeight: 600, fontSize: 18, width: '100%', whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{title}</span>
             </div>
             <div className="d-flex align-items-center mt-1">
-              <span  className="text-muted">
+              <div  className="text-muted mr-4">
                 <span role="img" aria-label="star"><i style={{color: '#ffc741'}}className="fa fa-star"></i></span>
                 {formatRating(rating)}/10
-              </span>
-              <span className="text-muted">{category}</span>
+              </div>
+              <div className="text-muted">{category}</div>
             </div>
             <div className="d-flex mt-3">
                 <a href={playUrl} className="btn btn-main btn-effect btn-sm d-flex align-items-center mr-3">
                   <i className="fa fa-play mr-1"></i>Play
                 </a>
-                <a href={detailsUrl} className="btn btn-main btn-effect btn-sm mr-3">Details</a>
+                <a href={detailsUrl} target="_blank" className="btn btn-main btn-effect btn-sm mr-3">Details</a>
                 <button 
                     className="btn btn-main btn-effect btn-sm"
                     onClick={() => setExpanded(!expanded)}

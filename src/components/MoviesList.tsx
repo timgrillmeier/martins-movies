@@ -173,20 +173,19 @@ export default function MoviesList({ initialData, initialQuery, initialPage }: M
                 const playUrl = movie.trailerUrl || "#";
                 const title = movie.title || movie.name || "Untitled";
                 const rating = movie.vote_average ? `${movie.vote_average}/10` : "N/A";
-                const category = Array.isArray(movie.genre_ids) ? movie.genre_ids.join(", ") : "";
+                const genreNames = Array.isArray(movie._genre_names) ? movie._genre_names : [];
                 const description = movie.overview || "No description available.";
                 const detailsUrl = movie.detailsUrl || `https://www.themoviedb.org/movie/${movie.id}`;
                 return (
-                  <MovieTile
-                    key={movie.id || idx}
-                    imageUrl={imageUrl}
-                    playUrl={playUrl}
-                    title={title}
-                    rating={rating}
-                    category={category}
-                    description={description}
-                    detailsUrl={detailsUrl}
-                  />
+                    <MovieTile
+                      imageUrl={imageUrl}
+                      playUrl={playUrl}
+                      title={title}
+                      rating={rating}
+                      category={genreNames.join(', ')}
+                      description={description}
+                      detailsUrl={detailsUrl}
+                    />
                 );
               })
             ) : (
@@ -198,20 +197,21 @@ export default function MoviesList({ initialData, initialQuery, initialPage }: M
                   const playUrl = movie.trailerUrl || "#";
                   const title = movie.title || movie.name || "Untitled";
                   const rating = movie.vote_average ? `${movie.vote_average}/10` : "N/A";
-                  const category = Array.isArray(movie.genre_ids) ? movie.genre_ids.join(", ") : "";
+                  const genreNames = Array.isArray(movie._genre_names) ? movie._genre_names : [];
                   const description = movie.overview || "No description available.";
                   const detailsUrl = movie.detailsUrl || `https://www.themoviedb.org/movie/${movie.id}`;
                   return (
-                    <MovieAccordion
-                      key={movie.id || idx}
-                      imageUrl={imageUrl}
-                      playUrl={playUrl}
-                      title={title}
-                      rating={rating}
-                      category={category}
-                      description={description}
-                      detailsUrl={detailsUrl}
-                    />
+                    <div key={movie.id || idx} style={{ position: 'relative' }}>
+                      <MovieAccordion
+                        imageUrl={imageUrl}
+                        playUrl={playUrl}
+                        title={title}
+                        rating={rating}
+                        category={genreNames.join(', ')}
+                        description={description}
+                        detailsUrl={detailsUrl}
+                      />
+                    </div>
                   );
                 })}
               </div>
