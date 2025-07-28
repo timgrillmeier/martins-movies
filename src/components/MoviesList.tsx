@@ -1,6 +1,8 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { getPopularMovies, searchMovies } from "../utils/api";
+import MovieTile from "./MovieTile";
+import Pagination from "./Pagination";
 import { useRouter } from "next/navigation";
 
 interface MoviesListProps {
@@ -91,37 +93,94 @@ export default function MoviesList({ initialData, initialQuery, initialPage }: M
   };
 
   return (
-    <div>
-      <form onSubmit={handleSearch} style={{ textAlign: "center", marginBottom: 24 }}>
-        <input
-          type="text"
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-          placeholder="Search by keyword..."
-          style={{ padding: 8, width: 300 }}
-        />
-        <button type="submit" style={{ marginLeft: 8 }}>Search</button>
-      </form>
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <>
-          <ul>
-            {movies && movies.length > 0 ? (
-              movies.map((movie: any, idx: number) => (
-                <li key={movie.id || idx}>{movie.title || movie.name}</li>
-              ))
-            ) : (
-              <li>No movies found.</li>
-            )}
-          </ul>
-          <div style={{ marginTop: 16 }}>
-            <button onClick={() => handlePageChange(page - 1)} disabled={page <= 1}>Prev</button>
-            <span style={{ margin: "0 12px" }}>Page {page}</span>
-            <button onClick={() => handlePageChange(page + 1)}>Next</button>
+    <main className="bg-light ptb100">
+      <div className="container">
+        {/* Start of Filters */}
+        <div className="row mb50">
+          <div className="col-md-6">
+            {/* Layout Switcher */}
+            <div className="layout-switcher">
+              <a className="list" style={{ cursor: 'pointer' }}><i className="fa fa-align-justify"></i></a>
+              <a className="grid active" style={{ cursor: 'pointer' }}><i className="fa fa-th"></i></a>
+            </div>
           </div>
-        </>
-      )}
-    </div>
+          <div className="col-md-6">
+            <div className="sort-by d-flex justify-content-end align-items-center">
+              {/* Search Bar */}
+              <form onSubmit={handleSearch} className="d-flex" style={{ marginRight: 16, width: 'auto' }}>
+                <input
+                  type="text"
+                  value={query}
+                  onChange={e => setQuery(e.target.value)}
+                  placeholder="Search by keyword..."
+                  className="form-control mr-2"
+                  style={{ minWidth: 200, maxWidth: 300 }}
+                />
+                <button type="submit" className="btn btn-main btn-effect">Search</button>
+              </form>
+              {/* Sort by (static for now) */}
+              <div className="sort-by-select">
+                <select className="chosen-select-no-single">
+                  <option>Default Order</option>
+                  <option>Featured</option>
+                  <option>Top Viewed</option>
+                  <option>Top Rated</option>
+                  <option>Newest</option>
+                  <option>Oldest</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* End of Filters */}
+
+        {/* Start of Movie List */}
+        <div className="row">
+          {loading ? (
+            <div className="col-12 text-center"><p>Loading...</p></div>
+          ) : movies && movies.length > 0 ? (
+            movies.map((movie: any, idx: number) => {
+              // Map TMDB data to MovieTileProps
+              const imageUrl = movie.poster_path
+                ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+                : "https://via.placeholder.com/500x750?text=No+Image";
+              const playUrl = movie.trailerUrl || "#";
+              const title = movie.title || movie.name || "Untitled";
+              const rating = movie.vote_average ? `${movie.vote_average}/10` : "N/A";
+              const category = Array.isArray(movie.genre_ids) ? movie.genre_ids.join(", ") : "";
+              const description = movie.overview || "No description available.";
+              const detailsUrl = movie.detailsUrl || `https://www.themoviedb.org/movie/${movie.id}`;
+              return (
+                <MovieTile
+                  key={movie.id || idx}
+                  imageUrl={imageUrl}
+                  playUrl={playUrl}
+                  title={title}
+                  rating={rating}
+                  category={category}
+                  description={description}
+                  detailsUrl={detailsUrl}
+                />
+              );
+            })
+          ) : (
+            <div className="col-12 text-center"><p>No movies found.</p></div>
+          )}
+        </div>
+        {/* End of Movie List */}
+
+        {/* Start of Pagination */}
+        <div className="row">
+          <div className="col-md-12 col-sm-12">
+            <Pagination
+              currentPage={page}
+              totalPages={initialData?.total_pages || 1}
+              onPageChange={handlePageChange}
+            />
+          </div>
+        </div>
+        {/* End of Pagination */}
+      </div>
+    </main>
   );
 }
