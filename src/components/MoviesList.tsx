@@ -143,7 +143,27 @@ export default function MoviesList({ initialData, initialQuery, initialPage }: M
 
         <div className="row">
           {loading ? (
-            <div className="col-12 text-center"><p>Loading...</p></div>
+            layout === 'grid' ? (
+              <div className="loading-grid col-12">
+                {Array.from({ length: 6 }).map((_, idx) => (
+                  <div
+                    key={idx}
+                    className="loading-tile"
+                    style={{ animationDelay: `${(idx % 4) * 0.2}s` }}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="loading-list col-12">
+                {Array.from({ length: 6 }).map((_, idx) => (
+                  <div
+                    key={idx}
+                    className="loading-row"
+                    style={{ animationDelay: `${(idx % 3) * 0.2}s` }}
+                  />
+                ))}
+              </div>
+            )
           ) : movies && movies.length > 0 ? (
             layout === 'grid' ? (
               movies.map((movie: any, idx: number) => {
@@ -201,15 +221,17 @@ export default function MoviesList({ initialData, initialQuery, initialPage }: M
           )}
         </div>
 
-        <div className="row">
-          <div className="col-md-12 col-sm-12">
-            <Pagination
-              currentPage={page}
-              totalPages={initialData?.total_pages || 1}
-              onPageChange={handlePageChange}
-            />
+        {!loading && (
+          <div className="row">
+            <div className="col-md-12 col-sm-12">
+              <Pagination
+                currentPage={page}
+                totalPages={initialData?.total_pages || 1}
+                onPageChange={handlePageChange}
+              />
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </main>
   );

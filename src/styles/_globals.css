@@ -1,3 +1,42 @@
+/* Loading animation for grid tiles */
+.loading-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px 0;
+}
+.loading-tile {
+  background: #fff;
+  border-radius: 12px;
+  min-width: 200px;
+  min-height: 540px;
+  margin: 12px;
+  flex: 1 0 31%;
+  max-width: 31%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  animation: loadingFade 2s infinite ease-in-out;
+}
+
+/* Loading animation for list rows */
+.loading-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px 0;
+}
+.loading-row {
+  background: #fff;
+  border-radius: 8px;
+  min-height: 120px;
+  margin: 8px 0;
+  width: 100%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  animation: loadingFade 2s infinite ease-in-out;
+}
+
+@keyframes loadingFade {
+  0% { opacity: 0.2; }
+  50% { opacity: 0.8; }
+  100% { opacity: 0.2; }
+}
 .movie-tile-description {
   height: 120px;
   overflow: hidden;
