@@ -120,7 +120,6 @@ export default function MoviesList({ initialData, initialQuery, initialPage }: M
           </div>
           <div className="col-md-6">
             <div className="sort-by d-flex justify-content-end align-items-center">
-              {/* Search Bar */}
               <form onSubmit={handleSearch} className="d-flex" style={{ marginRight: 16, width: 'auto' }}>
                 <input
                   type="text"
@@ -128,27 +127,16 @@ export default function MoviesList({ initialData, initialQuery, initialPage }: M
                   onChange={e => setQuery(e.target.value)}
                   placeholder="Search by keyword..."
                   className="form-control mr-2"
-                  style={{ minWidth: 200, maxWidth: 300 }}
+                  style={{ minWidth: 200, maxWidth: 300, width: '100%' }}
                 />
-                <button type="submit" className="btn btn-main btn-effect">Search</button>
+                <button type="submit" className="btn btn-main btn-effect">
+                  <i className="fa fa-search" style={{padding:0}}></i>
+                </button>
               </form>
-              {/* Sort by (static for now) */}
-              <div className="sort-by-select">
-                <select className="chosen-select-no-single">
-                  <option>Default Order</option>
-                  <option>Featured</option>
-                  <option>Top Viewed</option>
-                  <option>Top Rated</option>
-                  <option>Newest</option>
-                  <option>Oldest</option>
-                </select>
-              </div>
             </div>
           </div>
         </div>
-        {/* End of Filters */}
 
-        {/* Start of Movie List */}
         <div className="row">
           {loading ? (
             <div className="col-12 text-center"><p>Loading...</p></div>
@@ -208,9 +196,7 @@ export default function MoviesList({ initialData, initialQuery, initialPage }: M
             <div className="col-12 text-center"><p>No movies found.</p></div>
           )}
         </div>
-        {/* End of Movie List */}
 
-        {/* Start of Pagination */}
         <div className="row">
           <div className="col-md-12 col-sm-12">
             <Pagination
@@ -220,7 +206,6 @@ export default function MoviesList({ initialData, initialQuery, initialPage }: M
             />
           </div>
         </div>
-        {/* End of Pagination */}
       </div>
     </main>
   );
