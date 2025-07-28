@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { getPopularMovies, searchMovies } from "../utils/api";
+// import { getPopularMovies, searchMovies } from "../utils/api";
 import MovieTile from "./MovieTile";
 import MovieAccordion from "./MovieAccordion";
 import Pagination from "./Pagination";
@@ -37,13 +37,15 @@ export default function MoviesList({ initialData, initialQuery, initialPage }: M
       setPage(1);
       setLastQuery(query);
       setLoading(true);
-      
+
       let res;
       if (query) {
-        res = await searchMovies({ query, page: 1 });
+        const resp = await fetch(`/api/search?query=${encodeURIComponent(query)}&page=1`);
+        res = await resp.json();
         router.replace(`/query/${encodeURIComponent(query)}`);
       } else {
-        res = await getPopularMovies({ page: 1 });
+        const resp = await fetch(`/api/popular?page=1`);
+        res = await resp.json();
         router.replace("/");
       }
       setMovies(res?.results || []);
@@ -59,20 +61,22 @@ export default function MoviesList({ initialData, initialQuery, initialPage }: M
         ignoreNextPageEffect.current = false; // Reset flag
         return; 
     }
-    
+
     if (page === initialPage && query === initialQuery) return;
     setLoading(true);
     const fetchData = async () => {
       let res;
       if (query) {
-        res = await searchMovies({ query, page });
+        const resp = await fetch(`/api/search?query=${encodeURIComponent(query)}&page=${page}`);
+        res = await resp.json();
         if (page !== 1) {
           router.replace(`/query/${encodeURIComponent(query)}/page/${page}`);
         } else {
           router.replace(`/query/${encodeURIComponent(query)}`);
         }
       } else {
-        res = await getPopularMovies({ page });
+        const resp = await fetch(`/api/popular?page=${page}`);
+        res = await resp.json();
         if (page !== 1) {
           router.replace(`/page/${page}`);
         } else {
