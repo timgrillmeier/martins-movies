@@ -1,3 +1,13 @@
+/* Inline variant for watched checkbox in MovieAccordion */
+.watched-checkbox-container.inline {
+  position: relative;
+  display: inline-block;
+  top: 0;
+  left: 0;
+  margin-left: 0;
+  margin-right: 8px;
+  vertical-align: middle;
+}
 /* Watched Checkbox Styles for MovieTile */
 .watched-checkbox-container {
   position: absolute;
@@ -55,6 +65,7 @@
   border: 2px solid white;
 }
 
+.watched-checkbox-container.inline.checked .watched-checkbox-label:after,
 .watched-checkbox-container.checked .watched-checkbox-label:after {
   content: '';
   width: 6px;

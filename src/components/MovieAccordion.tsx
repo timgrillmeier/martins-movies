@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+"use client";
+import React, { useState, useEffect } from "react";
+import Cookies from "js-cookie";
 import Image from "next/image";
 
-interface MovieAccordionProps {
+type MovieAccordionProps = {
   imageUrl: string;
   playUrl: string;
   title: string;
@@ -9,7 +11,8 @@ interface MovieAccordionProps {
   category: string;
   description: string;
   detailsUrl: string;
-}
+  id?: number | string;
+};
 
 function formatRating(rating: string): string {
   const match = /([\d.]+)/.exec(rating);
@@ -20,6 +23,8 @@ function formatRating(rating: string): string {
   return rating;
 }
 
+const WATCHED_COOKIE = "watchedMovies";
+
 const MovieAccordion: React.FC<MovieAccordionProps> = ({
   imageUrl,
   playUrl,
@@ -28,8 +33,42 @@ const MovieAccordion: React.FC<MovieAccordionProps> = ({
   category,
   description,
   detailsUrl,
+  id,
 }) => {
   const [expanded, setExpanded] = useState(false);
+  const movieId = id ?? title;
+  const [watched, setWatched] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (!movieId) return;
+    const cookie = Cookies.get(WATCHED_COOKIE);
+    let watchedArr: (string | number)[] = [];
+    if (cookie) {
+      try {
+        watchedArr = JSON.parse(cookie);
+      } catch {}
+    }
+    setWatched(watchedArr.includes(movieId));
+  }, [movieId]);
+
+  const handleToggle = () => {
+    const cookie = Cookies.get(WATCHED_COOKIE);
+    let watchedArr: (string | number)[] = [];
+    if (cookie) {
+      try {
+        watchedArr = JSON.parse(cookie);
+      } catch {}
+    }
+    let newArr;
+    if (watched) {
+      newArr = watchedArr.filter((v) => v !== movieId);
+    } else {
+      newArr = [...watchedArr, movieId];
+    }
+    Cookies.set(WATCHED_COOKIE, JSON.stringify(newArr), { expires: 365 });
+    setWatched(!watched);
+  };
+
   return (
     <div className="accordion mb-4" style={{ background: '#fff', width: '100%' }}>
       <div className="accordion-item" style={{ background: '#fff', border: 'none' }}>
@@ -53,13 +92,13 @@ const MovieAccordion: React.FC<MovieAccordionProps> = ({
               </div>
               <div className="text-muted">{category}</div>
             </div>
-            <div className="d-flex mt-3">
+            <div className="d-flex mt-3 align-items-center flex-wrap">
                 <a href={playUrl} className="btn btn-main btn-effect btn-sm d-flex align-items-center mr-3">
                   <i className="fa fa-play mr-1"></i>Play
                 </a>
                 <a href={detailsUrl} target="_blank" className="btn btn-main btn-effect btn-sm mr-3">Details</a>
                 <button 
-                    className="btn btn-main btn-effect btn-sm"
+                    className="btn btn-main btn-effect btn-sm mr-3"
                     onClick={() => setExpanded(!expanded)}
                 >
                     {expanded ? (
@@ -68,6 +107,19 @@ const MovieAccordion: React.FC<MovieAccordionProps> = ({
                     <i className="fa fa-chevron-down" style={{padding:0}}></i>
                     )}
                 </button>
+                {watched !== null && (
+                  <div className={`watched-checkbox-container inline${watched ? ' checked' : ''}`} style={{marginLeft: 0}}>
+                    <label className="watched-checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={watched}
+                        onChange={handleToggle}
+                        className="watched-checkbox-input"
+                      />
+                      {watched ? "Watched" : "Mark as watched"}
+                    </label>
+                  </div>
+                )}
             </div>
           </div>
         </div>
