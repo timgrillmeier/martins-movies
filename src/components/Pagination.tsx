@@ -44,7 +44,6 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
     });
   }
   const pages = getPaginationPages(currentPage, totalPages);
-  console.log(pages);
 
   return (
     <div className="row">
