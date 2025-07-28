@@ -14,7 +14,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ [
   }
 
   return (
-    <div style={{ padding: 24 }}>
+    <div>
       <h1>Martin's Movies v2</h1>
       <MoviesList initialData={initialData} initialQuery={query} initialPage={page} />
     </div>
