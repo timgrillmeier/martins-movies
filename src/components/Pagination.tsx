@@ -9,8 +9,10 @@ interface PaginationProps {
 const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPageChange }) => {
   // Helper to generate smart pagination with truncation
   function getPaginationPages(current: number, total: number): (number | string)[] {
-    if (total <= 7) {
-      return Array.from({ length: total }, (_, i) => i + 1);
+    const maxPages = 500;
+    const cappedTotal = Math.min(total, maxPages);
+    if (cappedTotal <= 7) {
+      return Array.from({ length: cappedTotal }, (_, i) => i + 1);
     }
     const pages: (number | string)[] = [];
     // Always show first 2
@@ -22,20 +24,20 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
     }
     // Show window around current page
     const windowStart = Math.max(3, current - 2);
-    const windowEnd = Math.min(total - 2, current + 2);
+    const windowEnd = Math.min(cappedTotal - 2, current + 2);
     for (let i = windowStart; i <= windowEnd; i++) {
       pages.push(i);
     }
     // Show right ellipsis if needed
-    if (current < (total - 4)) {
+    if (current < (cappedTotal - 4)) {
       pages.push('...');
     }
     // Always show last 2
-    pages.push(total - 1);
-    pages.push(total);
+    pages.push(cappedTotal - 1);
+    pages.push(cappedTotal);
     // Remove duplicates while preserving order
     return pages.filter((item, idx, arr) => {
-        if (typeof item === 'number' && (item < 1 || item > total)) return false;
+        if (typeof item === 'number' && (item < 1 || item > cappedTotal)) return false;
         // Only filter duplicates for numbers, not for '...'
         if (item === '...') return true;
         return arr.indexOf(item) === idx;
@@ -82,7 +84,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
                 )}
               </li>
             ))}
-            {currentPage < totalPages && (
+            {currentPage < totalPages && currentPage < 500 && (
               <li>
                 <a
                   href="#"
