@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Image from "next/image";
 
 interface MovieAccordionProps {
   imageUrl: string;
@@ -30,35 +31,50 @@ const MovieAccordion: React.FC<MovieAccordionProps> = ({
 }) => {
   const [expanded, setExpanded] = useState(false);
   return (
-    <div className="accordion mb-3">
-      <div className="accordion-item">
-        <div className="accordion-header d-flex align-items-center" style={{ cursor: "pointer" }} onClick={() => setExpanded(!expanded)}>
-          <img
+    <div className="accordion mb-4" style={{ background: '#fff', width: '100%' }}>
+      <div className="accordion-item" style={{ background: '#fff', border: 'none' }}>
+        <div className="accordion-header d-flex align-items-center" style={{ cursor: "pointer", background: '#fff', border: 'none' }}>
+          <Image
             src={imageUrl && imageUrl.trim() !== "" && !imageUrl.includes("via.placeholder.com") ? imageUrl : "/images/movie-tile-fallback.png"}
-            alt=""
-            style={{ width: 100, height: 100, objectFit: "cover", borderRadius: 8, marginRight: 16 }}
+            alt={title}
+            width={100}
+            height={100}
+            style={{ objectFit: "contain", borderRadius: 8, marginRight: 16 }}
+            unoptimized={imageUrl?.startsWith("http")}
           />
           <div className="flex-grow-1">
             <div className="d-flex align-items-center justify-content-between">
-              <span className="movie-accordion-title" style={{ fontWeight: 600, fontSize: 18, maxWidth: 220, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{title}</span>
-              <button className="btn btn-sm btn-secondary" style={{ marginLeft: 16 }}>{expanded ? "Collapse" : "Expand"}</button>
+              <span className="movie-accordion-title" style={{ fontWeight: 600, fontSize: 18, width: '100%', whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{title}</span>
             </div>
-            <div className="d-flex align-items-center mt-1" style={{ fontSize: 14 }}>
-              <span style={{ color: "#a889f5", fontWeight: 700, marginRight: 8 }}>
-                <i className="fa fa-star" style={{ color: "#a889f5", marginRight: 2 }}></i>{formatRating(rating)}/10
+            <div className="d-flex align-items-center mt-1">
+              <span  className="text-muted">
+                <span role="img" aria-label="star"><i style={{color: '#ffc741'}}className="fa fa-star"></i></span>
+                {formatRating(rating)}/10
               </span>
-              <span className="text-muted" style={{ fontSize: 13 }}>{category}</span>
+              <span className="text-muted">{category}</span>
+            </div>
+            <div className="d-flex mt-3">
+                <a href={playUrl} className="btn btn-main btn-effect btn-sm d-flex align-items-center mr-3">
+                  <i className="fa fa-play mr-1"></i>Play
+                </a>
+                <a href={detailsUrl} className="btn btn-main btn-effect btn-sm mr-3">Details</a>
+                <button 
+                    className="btn btn-main btn-effect btn-sm"
+                    onClick={() => setExpanded(!expanded)}
+                >
+                    {expanded ? (
+                    <i className="fa fa-chevron-up" style={{padding:0}}></i>
+                    ) : (
+                    <i className="fa fa-chevron-down" style={{padding:0}}></i>
+                    )}
+                </button>
             </div>
           </div>
         </div>
         {expanded && (
           <div className="accordion-collapse show">
-            <div className="accordion-body">
-              <div className="d-flex mb-2">
-                <a href={playUrl} className="btn btn-effect btn-sm" style={{ background: "#a889f5", color: "#fff", marginRight: 8 }}>Play</a>
-                <a href={detailsUrl} className="btn btn-effect btn-sm" style={{ background: "#a889f5", color: "#fff" }}>Details</a>
-              </div>
-              <div style={{ fontSize: 15 }}>{description}</div>
+            <div className="accordion-body p-4">
+              <div>{description}</div>
             </div>
           </div>
         )}
