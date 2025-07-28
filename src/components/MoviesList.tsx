@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { getPopularMovies, searchMovies } from "../utils/api";
 import MovieTile from "./MovieTile";
+import MovieAccordion from "./MovieAccordion";
 import Pagination from "./Pagination";
 import { useRouter } from "next/navigation";
 
@@ -12,6 +13,7 @@ interface MoviesListProps {
 }
 
 export default function MoviesList({ initialData, initialQuery, initialPage }: MoviesListProps) {
+  const [layout, setLayout] = useState<'grid' | 'list'>('grid');
   const SEARCH_THROTTLE_MS = 400;
   const ignoreNextPageEffect = useRef(false);
   const [movies, setMovies] = useState(initialData?.results || []);
@@ -100,8 +102,20 @@ export default function MoviesList({ initialData, initialQuery, initialPage }: M
           <div className="col-md-6">
             {/* Layout Switcher */}
             <div className="layout-switcher">
-              <a className="list" style={{ cursor: 'pointer' }}><i className="fa fa-align-justify"></i></a>
-              <a className="grid active" style={{ cursor: 'pointer' }}><i className="fa fa-th"></i></a>
+              <a
+                className={`list${layout === 'list' ? ' active' : ''}`}
+                style={{ cursor: 'pointer' }}
+                onClick={() => setLayout('list')}
+              >
+                <i className="fa fa-align-justify"></i>
+              </a>
+              <a
+                className={`grid${layout === 'grid' ? ' active' : ''}`}
+                style={{ cursor: 'pointer' }}
+                onClick={() => setLayout('grid')}
+              >
+                <i className="fa fa-th"></i>
+              </a>
             </div>
           </div>
           <div className="col-md-6">
@@ -139,30 +153,57 @@ export default function MoviesList({ initialData, initialQuery, initialPage }: M
           {loading ? (
             <div className="col-12 text-center"><p>Loading...</p></div>
           ) : movies && movies.length > 0 ? (
-            movies.map((movie: any, idx: number) => {
-              // Map TMDB data to MovieTileProps
-              const imageUrl = movie.poster_path
-                ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-                : "https://via.placeholder.com/500x750?text=No+Image";
-              const playUrl = movie.trailerUrl || "#";
-              const title = movie.title || movie.name || "Untitled";
-              const rating = movie.vote_average ? `${movie.vote_average}/10` : "N/A";
-              const category = Array.isArray(movie.genre_ids) ? movie.genre_ids.join(", ") : "";
-              const description = movie.overview || "No description available.";
-              const detailsUrl = movie.detailsUrl || `https://www.themoviedb.org/movie/${movie.id}`;
-              return (
-                <MovieTile
-                  key={movie.id || idx}
-                  imageUrl={imageUrl}
-                  playUrl={playUrl}
-                  title={title}
-                  rating={rating}
-                  category={category}
-                  description={description}
-                  detailsUrl={detailsUrl}
-                />
-              );
-            })
+            layout === 'grid' ? (
+              movies.map((movie: any, idx: number) => {
+                const imageUrl = movie.poster_path
+                  ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+                  : "https://via.placeholder.com/500x750?text=No+Image";
+                const playUrl = movie.trailerUrl || "#";
+                const title = movie.title || movie.name || "Untitled";
+                const rating = movie.vote_average ? `${movie.vote_average}/10` : "N/A";
+                const category = Array.isArray(movie.genre_ids) ? movie.genre_ids.join(", ") : "";
+                const description = movie.overview || "No description available.";
+                const detailsUrl = movie.detailsUrl || `https://www.themoviedb.org/movie/${movie.id}`;
+                return (
+                  <MovieTile
+                    key={movie.id || idx}
+                    imageUrl={imageUrl}
+                    playUrl={playUrl}
+                    title={title}
+                    rating={rating}
+                    category={category}
+                    description={description}
+                    detailsUrl={detailsUrl}
+                  />
+                );
+              })
+            ) : (
+              <div className="col-12">
+                {movies.map((movie: any, idx: number) => {
+                  const imageUrl = movie.poster_path
+                    ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+                    : "https://via.placeholder.com/500x750?text=No+Image";
+                  const playUrl = movie.trailerUrl || "#";
+                  const title = movie.title || movie.name || "Untitled";
+                  const rating = movie.vote_average ? `${movie.vote_average}/10` : "N/A";
+                  const category = Array.isArray(movie.genre_ids) ? movie.genre_ids.join(", ") : "";
+                  const description = movie.overview || "No description available.";
+                  const detailsUrl = movie.detailsUrl || `https://www.themoviedb.org/movie/${movie.id}`;
+                  return (
+                    <MovieAccordion
+                      key={movie.id || idx}
+                      imageUrl={imageUrl}
+                      playUrl={playUrl}
+                      title={title}
+                      rating={rating}
+                      category={category}
+                      description={description}
+                      detailsUrl={detailsUrl}
+                    />
+                  );
+                })}
+              </div>
+            )
           ) : (
             <div className="col-12 text-center"><p>No movies found.</p></div>
           )}
